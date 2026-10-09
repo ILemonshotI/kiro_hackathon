@@ -1,0 +1,144 @@
+/* Background colors come from character.json "background" (M5 may override these vars at runtime). */
+:root {
+  --bg1: #fceabb;
+  --bg2: #f8b500;
+  --ink: #3a2a00;
+  --accent: #b35c00;
+  --focus: #1a4dff;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--ink);
+  background: linear-gradient(180deg, var(--bg1), var(--bg2));
+}
+
+/* Full-window canvas; renderer uses alpha:true so the gradient shows through. */
+#stage {
+  position: fixed;
+  inset: 0;
+}
+#stage canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Visible keyboard focus everywhere */
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Speech bubble (answer text) */
+.bubble {
+  position: fixed;
+  top: 6%;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: min(560px, 90vw);
+  padding: 14px 18px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  font-size: 1.1rem;
+  line-height: 1.4;
+  z-index: 2;
+}
+.bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 12px solid transparent;
+  border-top-color: #fff;
+  border-bottom: 0;
+}
+.bubble[hidden] { display: none; }
+.bubble.error { background: #ffe9e9; }
+.bubble.error::after { border-top-color: #ffe9e9; }
+
+/* Chat bar */
+.chat {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  width: min(640px, 94vw);
+  z-index: 2;
+}
+.chat input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 14px;
+  font-size: 1rem;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ink);
+}
+.chat button {
+  padding: 12px 18px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 0;
+  border-radius: 12px;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+.chat button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.chat button[aria-pressed="true"] {
+  background: var(--ink);
+}
+
+/* Click-to-start overlay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(4px);
+  z-index: 10;
+}
+.overlay[hidden] { display: none; }
+.overlay button {
+  padding: 18px 36px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  border: 0;
+  border-radius: 16px;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+.overlay button:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}

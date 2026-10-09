@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pete the Pineapple</title>
+  <link rel="stylesheet" href="/style.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/",
+        "@pixiv/three-vrm": "https://cdn.jsdelivr.net/npm/@pixiv/three-vrm@3.5.5/lib/three-vrm.module.min.js"
+      }
+    }
+  </script>
+</head>
+<body>
+  <!-- 3D scene (WebGL canvas is appended here by app.js) -->
+  <main id="stage" aria-label="3D character"></main>
+
+  <!-- Speech bubble / answer text (M2-M3). aria-live so screen readers announce answers. -->
+  <div id="bubble" class="bubble" role="status" aria-live="polite" hidden></div>
+
+  <!-- Chat UI (wired in M2; Dance in M4) -->
+  <form id="chat" class="chat" autocomplete="off">
+    <label for="chat-input" class="visually-hidden">Message</label>
+    <input id="chat-input" name="message" type="text" maxlength="500"
+           placeholder="Say something to Pete...">
+    <button id="send-btn" type="submit">Send</button>
+    <button id="dance-btn" type="button" aria-pressed="false">Dance</button>
+  </form>
+
+  <!-- Click to start (browsers block sound until a user gesture) -->
+  <div id="overlay" class="overlay">
+    <button id="start-btn" type="button" disabled>Loading...</button>
+  </div>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
