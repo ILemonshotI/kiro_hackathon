@@ -34,11 +34,15 @@ def _config_message() -> dict:
         "name": CHARACTER["name"],
         "avatar": CHARACTER["avatar"],
         "background": CHARACTER["background"],
-        "moves": [m["name"] for m in CHARACTER.get("moves", []) if "name" in m],
+        "moves": [
+            {"name": m["name"], "file": m.get("file", m["name"]), "loop": bool(m.get("loop"))}
+            for m in CHARACTER.get("moves", [])
+            if "name" in m
+        ],
     }
 
 
-async def _reply_message(text: str, emotion: str, fallback: bool = False) -> dict:
+async def _reply_message(text: str, emotion: str, fallback: bool = False, move: str = "none") -> dict:
     """Synthesize `text` with Polly; on Polly failure the reply is sent without audio."""
     audio, visemes = None, []
     try:
@@ -51,7 +55,7 @@ async def _reply_message(text: str, emotion: str, fallback: bool = False) -> dic
         "type": "reply",
         "text": text,
         "emotion": emotion,
-        "move": "none",
+        "move": move,
         "audio": audio,
         "visemes": visemes,
         "fallback": fallback,
@@ -74,7 +78,7 @@ async def _chat(text: str, thread_id: str) -> dict:
     try:
         # Sync graph call in a thread so the event loop (and WebSocket) stays responsive.
         reply = await asyncio.to_thread(agent.ask_sync, text, thread_id)
-        return await _reply_message(reply.text, reply.emotion)
+        return await _reply_message(reply.text, reply.emotion, move=reply.move)
     except Exception as exc:  # noqa: BLE001
         log.warning("Bedrock failed, using fallback line: %s", type(exc).__name__)
         return await _reply_message(FALLBACK_LINE, "sad", fallback=True)

@@ -2,9 +2,9 @@
 :root {
   --bg1: #e6f4ff;
   --bg2: #7fb8e6;
-  --ink: #3a2a00;
-  --accent: #b35c00;
-  --focus: #1a4dff;
+  --ink: #0f2a44;
+  --accent: #1d5f99;
+  --focus: #e07a00;
 }
 
 * { box-sizing: border-box; }

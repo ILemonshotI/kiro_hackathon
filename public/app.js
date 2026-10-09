@@ -304,6 +304,7 @@ async function playReply(msg) {
   emotion = EMOTIONS.includes(msg.emotion) ? msg.emotion : 'neutral';
   if (!msg.audio) {
     showTextOnly(msg.text);
+    runMove(msg.move);
     return;
   }
   let buffer;
@@ -312,6 +313,7 @@ async function playReply(msg) {
   } catch (err) {
     console.warn('Could not decode reply audio', err);
     showTextOnly(msg.text);
+    runMove(msg.move);
     return;
   }
   const source = audioCtx.createBufferSource();
@@ -324,6 +326,7 @@ async function playReply(msg) {
     speech = null;
     hideBubble();
     setState('idle');
+    runMove(msg.move); // bonus B: moves start after the voice ends
   };
   showBubble(msg.text);
   setState('speaking');
@@ -366,6 +369,27 @@ function stopDance() {
   playClip(STATE_CLIPS[state]);
 }
 
+// ---------- Bonus B: moves chosen by the AI (from character.json "moves") ----------
+let MOVES = {}; // name -> { file, loop }
+let moveToken = 0; // bumped on every new message so a running one-shot move stops its follow-ups
+
+async function runMove(name) {
+  const move = MOVES[name];
+  if (!move || !introDone || !CLIP_NAMES.includes(move.file)) return;
+  const token = ++moveToken;
+  if (move.file === 'dance') { startDance(); return; } // dance loop + music
+  if (move.loop) { playClip(move.file); return; }
+  const action = playClip(move.file, { loop: false });
+  await waitFinished(action);
+  if (token !== moveToken) return;
+  if (move.file === 'fall-flat') { // get back up after fainting
+    const stand = playClip('stand-up', { loop: false, startAt: 2.5, timeScale: 1.6 });
+    await waitFinished(stand);
+    if (token !== moveToken) return;
+  }
+  playClip(STATE_CLIPS[state]);
+}
+
 danceBtn.addEventListener('click', () => {
   if (dancing) stopDance();
   else startDance();
@@ -400,6 +424,9 @@ function applyConfig(cfg) {
       console.error(err);
       startBtn.textContent = 'Failed to load the character';
     });
+  }
+  if (Array.isArray(cfg.moves)) {
+    MOVES = Object.fromEntries(cfg.moves.map((m) => [m.name, { file: m.file, loop: !!m.loop }]));
   }
   if (cfg.name) {
     document.title = cfg.name;
@@ -458,6 +485,7 @@ chatForm.addEventListener('submit', (e) => {
     showError("I can't reach the shop right now. Please try again in a moment.");
     return;
   }
+  moveToken++;
   stopDance();
   stopSpeech();
   hideBubble();
