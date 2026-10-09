@@ -1,7 +1,7 @@
 /* Background colors come from character.json "background" (M5 may override these vars at runtime). */
 :root {
-  --bg1: #fceabb;
-  --bg2: #f8b500;
+  --bg1: #e6f4ff;
+  --bg2: #7fb8e6;
   --ink: #3a2a00;
   --accent: #b35c00;
   --focus: #1a4dff;
